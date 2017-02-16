@@ -125,7 +125,7 @@ service.postTorrent = (data) => {
         }
     }, {
         headers: {
-            'x-transmission-session-id': service.sessionId
+            'x-transmission-session-id': service.sessionId?service.sessionId:'empty'
         }
     }).then(res => {
         console.log(res);
