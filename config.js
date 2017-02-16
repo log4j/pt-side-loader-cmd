@@ -17,8 +17,11 @@ module.exports = {
     },
     folders: [
         {
-            label: 'movie',
-            value: ''
+            label: 'Movie',
+            value: '/volume2/media'
+        },{
+            label: 'Shows',
+            value: '/volume2/shows'
         }
     ]
 }
