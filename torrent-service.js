@@ -101,7 +101,15 @@ service.getTorrentList = () => {
         method: 'torrent-get',
         arguments: {
             fields: [
-                'id', 'name', 'status', 'totalSize'
+                'id', 
+                'name', 
+                'status', 
+                'totalSize',
+                'rateDownload',
+                'rateUpload',
+                'startDate',
+                'downloadedEver',
+                'uploadedEver'
             ]
         }
     }, {
