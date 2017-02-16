@@ -1,7 +1,50 @@
 'use strict';
 var config = require('./config');
-var $http = require('node-httpclient');
+var $ = require('node-httpclient');
 
+var httpclient = require('http-client')
+
+var $http = {
+    get: (url, opt) => {
+
+    },
+    post: (url, data, opt) => {
+        return new Promise((resolve, reject) => {
+            $.ajax({
+                url: url,
+                type: 'POST',
+                contentType:'application/json',
+                data: data,
+                // dataType: "json",
+                success: (data, status, headers) => {
+                    // console.log(data);
+                    resolve({
+                        data: data,
+                        status: status,
+                        headers: headers
+                    })
+                },
+                error: (data, status, headers) => {
+                    // console.log(data, status, headers);
+                    reject({
+                        data: data,
+                        status: status,
+                        headers: headers
+                    });
+                },
+                headers: opt ? opt.headers : {}
+            })
+        });
+    }
+}
+
+// var fetch = {
+//     get: null,
+//     post: httpclient.createFetch(
+//         httpclient.method('POST'),
+
+//     )
+// }
 
 var service = {
 
@@ -9,7 +52,7 @@ var service = {
 
 service.sessionId = '';
 
-service.url = config.transimission.host +':' + config.transimission.port + config.transimission.path;
+service.url = config.transimission.host + ':' + config.transimission.port + config.transimission.path;
 
 console.log(service.url);
 
@@ -29,12 +72,19 @@ service.initSession = () => {
     return $http.post(service.url, {
         method: 'session-get'
     }).then(res => {
+        // console.log(res);
         service.sessionId = res.headers['x-transmission-session-id'];
-        return { result: !(!service.sessionId), data: service.sessionId }
+        return {
+            result: !(!service.sessionId),
+            data: service.sessionId
+        }
     }, res => {
-        console.log(res.headers);
+        // console.log(res.headers);
         service.sessionId = res.headers['x-transmission-session-id'];
-        return { result: !(!service.sessionId), data: service.sessionId }
+        return {
+            result: !(!service.sessionId),
+            data: service.sessionId
+        }
     })
 }
 
@@ -47,19 +97,24 @@ service.getTorrentList = () => {
             ]
         }
     }, {
-            headers: {
-                'x-transmission-session-id': service.sessionId
+        headers: {
+            'x-transmission-session-id': service.sessionId
+        }
+    }).then(res => {
+        // console.log(res);
+        return {
+            result: true,
+            data: res.data.arguments.torrents
+        };
+    }, res => {
+        // console.log(res);
+        if (service.recheckSession(res))
+            return service.getTorrentList();
+        else
+            return {
+                result: false
             }
-        }).then(res => {
-            console.log(res);
-            return { result: true, data: res.data.arguments.torrents };
-        }, res => {
-            console.log(res);
-            if (service.recheckSession(res))
-                return service.getTorrentList();
-            else
-                return { result: false }
-        })
+    })
 }
 
 service.postTorrent = (data) => {
@@ -69,18 +124,23 @@ service.postTorrent = (data) => {
             metainfo: data.torrent
         }
     }, {
-            headers: {
-                'x-transmission-session-id': service.sessionId
+        headers: {
+            'x-transmission-session-id': service.sessionId
+        }
+    }).then(res => {
+        console.log(res);
+        return {
+            result: true,
+            data: res.data
+        };
+    }, res => {
+        if (service.recheckSession(res))
+            return service.postTorrent(data);
+        else
+            return {
+                result: false
             }
-        }).then(res => {
-            console.log(res);
-            return { result: true, data: res.data };
-        }, res => {
-            if (service.recheckSession(res))
-                return service.postTorrent(data);
-            else
-                return { result: false }
-        })
+    })
 }
 
 module.exports = service;

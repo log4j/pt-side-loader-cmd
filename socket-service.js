@@ -11,9 +11,10 @@ var service = {
 service.connectPtSideServer = () => {
     console.log('start connecting Transimission...');
     torrentService.initSession().then(res => {
-        console.log(res);
-        torrentService.getTorrentList().then(dd=>{
-            console.log(dd);
+        // console.log(res);
+        torrentService.getTorrentList().then(dd => {
+            if (dd && dd.result)
+                console.log('Current Seeding:', dd.data.length);
         })
     })
     console.log('start connecting PT Server');
@@ -24,7 +25,8 @@ service.connectPtSideServer = () => {
         service.socket.emit('credentials_verify', {
             username: config.account.username,
             password: config.account.password,
-            device: config.account.deviceId
+            device: config.account.deviceId,
+            folders: config.folders
         });
     });
 
@@ -42,7 +44,10 @@ service.connectPtSideServer = () => {
         console.log(data);
 
         // Respond with a message including this clients' id sent from the server
-        service.socket.emit('i am client', { data: 'foo!', id: data.id });
+        service.socket.emit('i am client', {
+            data: 'foo!',
+            id: data.id
+        });
     });
     service.socket.on('time', function (data) {
         console.log(data);
@@ -55,7 +60,7 @@ service.connectPtSideServer = () => {
     });
 
     service.socket.on('fetch_torrents', (data, fn) => {
-        console.log(data);
+        // console.log(data);
         // fn(['a','b']);
 
         torrentService.getTorrentList().then(res => {
@@ -71,6 +76,14 @@ service.connectPtSideServer = () => {
             fn(res.data);
         });
     });
+
+    // service.socket.on('fetch_folder', (data, fn) => {
+    //     // fn(['a','b']);
+    //     torrentService.postTorrent(data).then(res => {
+    //         fn(res.data);
+    //     });
+    // });
+
 
 
 

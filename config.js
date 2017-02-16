@@ -12,5 +12,11 @@ module.exports = {
         username: 'yangmang',
         password: '',
         deviceId: 'Test Device'
-    }
+    },
+    folders: [
+        {
+            label: 'movie',
+            value: ''
+        }
+    ]
 }
