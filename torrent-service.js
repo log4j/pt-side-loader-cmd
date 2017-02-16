@@ -13,7 +13,7 @@ var $http = {
             $.ajax({
                 url: url,
                 type: 'POST',
-                contentType:'application/json',
+                contentType: 'application/json',
                 data: data,
                 // dataType: "json",
                 success: (data, status, headers) => {
@@ -97,35 +97,41 @@ service.getTorrentList = () => {
             ]
         }
     }, {
-        headers: {
-            'x-transmission-session-id': service.sessionId?service.sessionId:'empty'
-        }
-    }).then(res => {
-        // console.log(res);
-        return {
-            result: true,
-            data: res.data.arguments.torrents
-        };
-    }, res => {
-        // console.log(res);
-        if (service.recheckSession(res))
-            return service.getTorrentList();
-        else
-            return {
-                result: false
+            headers: {
+                'x-transmission-session-id': service.sessionId ? service.sessionId : 'empty'
             }
-    })
+        }).then(res => {
+            // console.log(res);
+            return {
+                result: true,
+                data: res.data.arguments.torrents
+            };
+        }, res => {
+            // console.log(res);
+            if (service.recheckSession(res))
+                return service.getTorrentList();
+            else
+                return {
+                    result: false
+                }
+        })
 }
 
 service.postTorrent = (data) => {
-    return $http.post(service.url, {
+    let body = {
         method: 'torrent-add',
         arguments: {
             metainfo: data.torrent
         }
-    }, {
+    };
+
+    if (data.target) {
+        body.arguments["download-dir"] = data.target;
+    }
+
+    return $http.post(service.url, body, {
         headers: {
-            'x-transmission-session-id': service.sessionId?service.sessionId:'empty'
+            'x-transmission-session-id': service.sessionId ? service.sessionId : 'empty'
         }
     }).then(res => {
         console.log(res);
