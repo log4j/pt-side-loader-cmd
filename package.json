@@ -1,0 +1,23 @@
+{
+  "name": "pt-side-loader-cmd",
+  "version": "0.0.1",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/log4j/pt-side-loader-cmd.git"
+  },
+  "author": "Mang Yang",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/log4j/pt-side-loader-cmd/issues"
+  },
+  "homepage": "https://github.com/log4j/pt-side-loader-cmd#readme",
+  "dependencies": {
+    "node-httpclient": "0.0.2",
+    "socket.io": "^1.7.2"
+  }
+}
