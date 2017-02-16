@@ -72,14 +72,14 @@ service.initSession = () => {
     return $http.post(service.url, {
         method: 'session-get'
     }).then(res => {
-        // console.log(res);
+        console.log(res);
         service.sessionId = res.headers['x-transmission-session-id'];
         return {
             result: !(!service.sessionId),
             data: service.sessionId
         }
     }, res => {
-        // console.log(res.headers);
+        console.log(res);
         service.sessionId = res.headers['x-transmission-session-id'];
         return {
             result: !(!service.sessionId),
