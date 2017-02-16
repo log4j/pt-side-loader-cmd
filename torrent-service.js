@@ -3,12 +3,20 @@ var config = require('./config');
 var $ = require('node-httpclient');
 
 var httpclient = require('http-client')
+var headerAuth = null;
+if(config.transimission.authorization){
+    headerAuth = "Basic " + new Buffer(config.transimission.username + ":" + config.transimission.password).toString("base64");
+}
 
 var $http = {
     get: (url, opt) => {
 
     },
     post: (url, data, opt) => {
+        let headers = opt ? opt.headers : {};
+        if(headerAuth){
+            headers["Authorization"] = headerAuth;
+        }
         return new Promise((resolve, reject) => {
             $.ajax({
                 url: url,
@@ -32,7 +40,7 @@ var $http = {
                         headers: headers
                     });
                 },
-                headers: opt ? opt.headers : {}
+                headers: headers
             })
         });
     }
