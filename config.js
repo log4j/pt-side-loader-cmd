@@ -3,7 +3,9 @@ module.exports = {
         host: 'http://127.0.0.1',
         path: '/transmission/rpc',
         port: 9091,
-        password: ''
+		authorization: true,
+		username: 'yangmang',
+        password: 'mission'
     },
     server: {
         host: 'http://word.mangs.site:5000'
@@ -11,7 +13,7 @@ module.exports = {
     account: {
         username: 'yangmang',
         password: '',
-        deviceId: 'Test Device'
+        deviceId: 'DSM Transmission'
     },
     folders: [
         {
