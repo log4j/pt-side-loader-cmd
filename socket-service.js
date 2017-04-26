@@ -17,11 +17,11 @@ service.connectPtSideServer = () => {
                 console.log('Current Seeding:', dd.data.length);
         })
     })
-    console.log('start connecting PT Server');
+    console.log('start connecting PT Server...');
 
     service.socket = io(config.server.host);
     service.socket.on('credentials_require', data => {
-        console.log(data);
+        console.log('Verify your identity...');
         service.socket.emit('credentials_verify', {
             username: config.account.username,
             password: config.account.password,
@@ -31,13 +31,11 @@ service.connectPtSideServer = () => {
     });
 
     service.socket.on('credentials_confirmed', data => {
-        console.log(data);
         if (data && data.result) {
-
             service.server.state = 'connected';
             service.server.id = data.data;
             service.serverUpdated = new Date();
-            console.log('updated!!!!');
+            console.log('Indentity verified. Device id: ' + data.data);
         }
     })
     service.socket.on('welcome', function (data) {

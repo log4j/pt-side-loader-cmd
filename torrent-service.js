@@ -4,7 +4,7 @@ var $ = require('node-httpclient');
 
 var httpclient = require('http-client')
 var headerAuth = null;
-if(config.transimission.authorization){
+if (config.transimission.authorization) {
     headerAuth = "Basic " + new Buffer(config.transimission.username + ":" + config.transimission.password).toString("base64");
 }
 
@@ -14,7 +14,7 @@ var $http = {
     },
     post: (url, data, opt) => {
         let headers = opt ? opt.headers : {};
-        if(headerAuth){
+        if (headerAuth) {
             headers["Authorization"] = headerAuth;
         }
         return new Promise((resolve, reject) => {
@@ -62,7 +62,7 @@ service.sessionId = '';
 
 service.url = config.transimission.host + ':' + config.transimission.port + config.transimission.path;
 
-console.log(service.url);
+console.log('Transmission connection ', service.url);
 
 service.recheckSession = function (res) {
     if (res.status === 409) {
@@ -80,15 +80,19 @@ service.initSession = () => {
     return $http.post(service.url, {
         method: 'session-get'
     }).then(res => {
-        console.log(res);
+        console.log('Transmission session created!');
         service.sessionId = res.headers['x-transmission-session-id'];
         return {
             result: !(!service.sessionId),
             data: service.sessionId
         }
     }, res => {
-        console.log(res);
+        console.log('Try to build session with Transmission...');
+        // console.log(res);
         service.sessionId = res.headers['x-transmission-session-id'];
+        if (!service.sessionId) {
+            console.log('Can not connect to Transmission. Please make sure Transmission is running and Remote is enabled!');
+        }
         return {
             result: !(!service.sessionId),
             data: service.sessionId
@@ -101,9 +105,9 @@ service.getTorrentList = () => {
         method: 'torrent-get',
         arguments: {
             fields: [
-                'id', 
-                'name', 
-                'status', 
+                'id',
+                'name',
+                'status',
                 'totalSize',
                 'rateDownload',
                 'rateUpload',
