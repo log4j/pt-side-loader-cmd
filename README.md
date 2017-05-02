@@ -10,4 +10,5 @@ If you prefer to use commandline to start up the PT side loader, you can take th
 * install `nodejs`
 * update `config.js` according to your account information
 * run `npm start`
+* `npm stop` can terminal pt-side-loader-cmd
 
