@@ -8,6 +8,8 @@ if (config.transimission.authorization) {
     headerAuth = "Basic " + new Buffer(config.transimission.username + ":" + config.transimission.password).toString("base64");
 }
 
+
+
 var $http = {
     get: (url, opt) => {
 
@@ -53,12 +55,14 @@ var $http = {
 
 //     )
 // }
+var possibleKeys = ['x-transmission-session-id', 'X-Transmission-Session-Id'];
 
 var service = {
 
 }
 
 service.sessionId = '';
+service.sessionKey = '';
 
 service.url = config.transimission.host + ':' + config.transimission.port + config.transimission.path;
 
@@ -66,8 +70,16 @@ console.log('Transmission connection ', service.url);
 
 service.recheckSession = function (res) {
     if (res.status === 409) {
+        // console.log(res.headers);
+        for (var i = 0; i < possibleKeys.length; i++) {
+            if (res.headers[possibleKeys[i]]) {
+                service.sessionKey = possibleKeys[i];
+            }
+        }
+        service.sessionId = res.headers[service.sessionKey];
+        service.headers = {};
+        service.headers[service.sessionKey] = service.sessionId ? service.sessionId : 'empty';
 
-        service.sessionId = res.headers['x-transmission-session-id'];
         if (service.sessionId)
             return true;
         else
@@ -81,7 +93,10 @@ service.initSession = () => {
         method: 'session-get'
     }).then(res => {
         console.log('Transmission session created!');
-        service.sessionId = res.headers['x-transmission-session-id'];
+
+        service.recheckSession(res);
+        service.sessionId = res.headers[service.sessionKey];
+
         return {
             result: !(!service.sessionId),
             data: service.sessionId
@@ -89,7 +104,9 @@ service.initSession = () => {
     }, res => {
         console.log('Try to build session with Transmission...');
         // console.log(res);
-        service.sessionId = res.headers['x-transmission-session-id'];
+        service.recheckSession(res);
+
+        service.sessionId = res.headers[service.sessionKey];
         if (!service.sessionId) {
             console.log('Can not connect to Transmission. Please make sure Transmission is running and Remote is enabled!');
         }
@@ -117,9 +134,7 @@ service.getTorrentList = () => {
             ]
         }
     }, {
-            headers: {
-                'x-transmission-session-id': service.sessionId ? service.sessionId : 'empty'
-            }
+            headers: service.headers
         }).then(res => {
             // console.log(res);
             return {
@@ -150,9 +165,7 @@ service.postTorrent = (data) => {
     }
 
     return $http.post(service.url, body, {
-        headers: {
-            'x-transmission-session-id': service.sessionId ? service.sessionId : 'empty'
-        }
+        headers: service.headers
     }).then(res => {
         console.log(res);
         return {
